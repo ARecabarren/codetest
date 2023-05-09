@@ -92,10 +92,43 @@ class LinkedList
         string = ""
         self.each do |node|
 
-            node.next_node.nil? ? string += " nil" : string += " ( #{node.value} ) ->"
+            node.next_node.nil? ? string += "( #{node.value} ) -> nil" : string += " ( #{node.value} ) ->"
         end
         puts string
     end
+
+    #Add insert_at(value, index)
+    def insert_at(value, index)
+        return "Out of range" if self.at_index(index).nil?
+        return prepend(value) if index.zero?
+        
+        precedent_node = self.at_index(index).next_node
+        new_node = Node.new(value, precedent_node)
+
+        #Rewire
+        self.at_index(index).next_node = new_node
+
+        #Rearrange array
+        @array = @array.slice(0..index - 1).append(new_node, @array.slice(index..)).flatten
+        
+    end
+    #Add remove_at(value, index)
+    def remove_at(index)
+        return "Out of range" if self.at_index(index).nil?
+        return self.pop if index == @array.length - 1
+
+        precedent_node = self.at_index(index - 1).next_node
+        post_node = self.at_index(index + 1)
+
+        #Remove pointer
+        self.at_index(index).next_node = nil
+        #Rewind
+        post_node.next_node = precedent_node
+        #Rearrange array
+        @array = @array.slice(0..index - 1).append(@array.slice(index + 1..)).flatten
+
+    end
+
 end
 
 # Class representing list items
@@ -120,11 +153,24 @@ myList.prepend('I steal the 1st place')
 myList.append('3rd item')
 # puts myList.contains?('First item')
 # puts myList.contains?('I steal the 1st place')
-puts myList.find('First item')
+# puts myList.find('First item')
 
-puts myList.find('I steal the 1st place')
-myList.to_s
+# puts myList.find('I steal the 1st place')
+# myList.to_s
 
 # puts myList.size
 # puts myList.head.value
 # puts myList.tail.value
+
+newList = LinkedList.new
+newList.append(0)
+newList.append(1)
+newList.to_s
+newList.append(2)
+newList.append(3)
+newList.append('REMOVE me')
+newList.insert_at('Im the thing',4)
+newList.to_s
+
+newList.remove_at(4)
+newList.to_s
